@@ -1,0 +1,450 @@
+
+<div class="weather-app">
+  <div class="weather-card">
+    <section class="weather-top">
+      <div class="location-area">
+        <span class="pin">●</span>
+        <div class="location-control">
+          <input id="citySearch" value="도쿄" placeholder="도시 검색">
+          <button id="searchBtn" aria-label="지역 검색">⌕</button>
+        </div>
+      </div>
+      <div id="searchResults" class="search-results"></div>
+
+      <div class="current-weather">
+        <div>
+          <div id="temperature" class="temperature">--°</div>
+          <div id="feelsLike" class="feels-like">체감온도 --°</div>
+        </div>
+        <div class="current-icon-area">
+          <div id="currentIcon" class="current-icon">☀</div>
+          <div id="condition" class="condition">날씨 정보를 불러오는 중</div>
+        </div>
+      </div>
+
+      <div class="hourly-header">시간별 날씨</div>
+      <div id="hourly" class="hourly-list"></div>
+    </section>
+
+    <section class="weekly-section">
+      <div class="weekly-title">7일간 날씨</div>
+      <div id="weekly" class="weekly-list"></div>
+    </section>
+    <div id="updated" class="updated"></div>
+  </div>
+</div>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&display=swap');
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 12px;
+  background: #f1f1fa;
+  font-family: Inter, 'Noto Sans KR', sans-serif;
+  color: #101827;
+}
+
+.weather-app {
+  width: 100%;
+  max-width: 520px;
+  margin: auto;
+}
+
+.weather-card {
+  overflow: hidden;
+  background: white;
+  border-radius: 27px;
+  box-shadow: 0 8px 30px rgba(67, 76, 130, .07);
+}
+
+.weather-top {
+  position: relative;
+  padding: 25px 26px 22px;
+  background: linear-gradient(145deg, #fafaff, #eef0ff);
+}
+
+.location-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pin {
+  color: #737d91;
+  font-size: 18px;
+}
+
+.location-control {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.location-control input {
+  width: 145px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #536079;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.location-control button {
+  border: none;
+  background: transparent;
+  color: #68758d;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.search-results {
+  display: none;
+  position: absolute;
+  z-index: 5;
+  top: 62px;
+  left: 48px;
+  right: 25px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px #30385b22;
+  overflow: hidden;
+}
+
+.search-results button {
+  display: block;
+  width: 100%;
+  padding: 12px 15px;
+  border: 0;
+  border-bottom: 1px solid #eee;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  color: #26334a;
+  font-size: 14px;
+}
+
+.search-results button:hover { background: #f1f2ff; }
+
+.current-weather {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 116px;
+}
+
+.temperature {
+  font-size: 47px;
+  font-weight: 400;
+  letter-spacing: -2px;
+}
+
+.feels-like {
+  margin-top: 4px;
+  color: #8992a7;
+  font-size: 12px;
+}
+
+.current-icon-area {
+  text-align: center;
+  min-width: 90px;
+}
+
+.current-icon {
+  font-size: 57px;
+  line-height: 1.2;
+  color: #7180ff;
+}
+
+.condition {
+  margin-top: 9px;
+  font-size: 15px;
+  color: #66738e;
+}
+
+.hourly-header {
+  margin: 10px 0 15px;
+  color: #78839c;
+  font-size: 12px;
+}
+
+.hourly-list {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.hourly-list::-webkit-scrollbar { display: none; }
+
+.hour-item {
+  flex: 0 0 48px;
+  text-align: center;
+}
+
+.hour-time {
+  color: #6c7892;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.hour-icon {
+  margin: 9px 0 7px;
+  color: #7280ff;
+  font-size: 22px;
+}
+
+.hour-temp {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.weekly-section {
+  padding: 22px 25px 14px;
+}
+
+.weekly-title {
+  margin-bottom: 9px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #27344b;
+}
+
+.week-row {
+  display: grid;
+  grid-template-columns: 1fr 40px 48px 48px;
+  align-items: center;
+  min-height: 37px;
+  gap: 7px;
+}
+
+.week-day { font-size: 14px; }
+
+.week-icon {
+  color: #7180ff;
+  font-size: 21px;
+  text-align: center;
+}
+
+.week-high {
+  text-align: right;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.week-low {
+  text-align: right;
+  color: #8993a8;
+  font-size: 13px;
+}
+
+.updated {
+  padding: 0 20px 15px;
+  color: #a0a7b6;
+  text-align: right;
+  font-size: 10px;
+}
+
+@media(max-width: 380px) {
+  .weather-top { padding: 22px 19px; }
+  .weekly-section { padding-left: 19px; padding-right: 19px; }
+  .temperature { font-size: 42px; }
+}
+</style>
+
+<script>
+const geoAPI = 'https://geocoding-api.open-meteo.com/v1/search';
+const weatherAPI = 'https://api.open-meteo.com/v1/forecast';
+
+const $ = id => document.getElementById(id);
+
+const weatherTypes = {
+  0: ['맑음', '☀'],
+  1: ['대체로 맑음', '🌤'],
+  2: ['구름 조금', '⛅'],
+  3: ['흐림', '☁'],
+  45: ['안개', '🌫'],
+  48: ['짙은 안개', '🌫'],
+  51: ['약한 이슬비', '🌦'],
+  53: ['이슬비', '🌦'],
+  55: ['강한 이슬비', '🌧'],
+  56: ['어는 이슬비', '🌧'],
+  57: ['강한 어는 이슬비', '🌧'],
+  61: ['약한 비', '🌧'],
+  63: ['비', '🌧'],
+  65: ['강한 비', '🌧'],
+  66: ['어는 비', '🌧'],
+  67: ['강한 어는 비', '🌧'],
+  71: ['약한 눈', '🌨'],
+  73: ['눈', '❄'],
+  75: ['강한 눈', '❄'],
+  77: ['싸락눈', '🌨'],
+  80: ['소나기', '🌦'],
+  81: ['강한 소나기', '🌧'],
+  82: ['폭우', '⛈'],
+  85: ['눈 소나기', '🌨'],
+  86: ['강한 눈 소나기', '❄'],
+  95: ['뇌우', '⛈'],
+  96: ['우박 동반 뇌우', '⛈'],
+  99: ['강한 뇌우', '⛈']
+};
+
+function weatherInfo(code, isDay = 1) {
+  const info = weatherTypes[code] || ['날씨 정보', '☁'];
+  let icon = info[1];
+  if (code === 0 && !isDay) icon = '🌙';
+  if (code === 1 && !isDay) icon = '☁';
+  if (code === 2 && !isDay) icon = '☁';
+  return { name: info[0], icon };
+}
+
+function formatDay(date, index) {
+  if (index === 0) return '오늘';
+  if (index === 1) return '내일';
+  return new Date(date + 'T12:00:00').toLocaleDateString('ko-KR', {
+    weekday: 'long'
+  });
+}
+
+async function searchCity() {
+  const query = $('citySearch').value.trim();
+  if (!query) return;
+
+  $('searchResults').style.display = 'block';
+  $('searchResults').innerHTML =
+    '<button disabled>지역 검색 중...</button>';
+
+  try {
+    const url = `${geoAPI}?name=${encodeURIComponent(query)}&count=8&language=ko&format=json`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.results?.length) {
+      $('searchResults').innerHTML =
+        '<button disabled>검색 결과가 없습니다.</button>';
+      return;
+    }
+
+    $('searchResults').innerHTML = '';
+
+    data.results.forEach(place => {
+      const btn = document.createElement('button');
+      btn.textContent = [
+        place.name,
+        place.admin1,
+        place.country
+      ].filter(Boolean).join(' · ');
+
+      btn.addEventListener('click', () => {
+        $('searchResults').style.display = 'none';
+        $('citySearch').value = place.name;
+        loadWeather(place.latitude, place.longitude, place.name);
+      });
+
+      $('searchResults').appendChild(btn);
+    });
+  } catch (error) {
+    $('searchResults').innerHTML =
+      '<button disabled>검색에 실패했습니다. 다시 시도해 주세요.</button>';
+  }
+}
+
+async function loadWeather(lat, lon, city) {
+  $('temperature').textContent = '--°';
+  $('condition').textContent = '날씨 정보를 불러오는 중';
+
+  const params = new URLSearchParams({
+    latitude: lat,
+    longitude: lon,
+    current: 'temperature_2m,apparent_temperature,weather_code,is_day',
+    hourly: 'temperature_2m,precipitation_probability,weather_code',
+    daily: 'weather_code,temperature_2m_max,temperature_2m_min',
+    forecast_days: 7,
+    timezone: 'auto'
+  });
+
+  try {
+    const response = await fetch(`${weatherAPI}?${params}`);
+    if (!response.ok) throw new Error('Weather API error');
+    const data = await response.json();
+
+    renderWeather(data, city);
+  } catch (error) {
+    $('condition').textContent = '날씨 정보를 불러오지 못했습니다.';
+    $('hourly').innerHTML = '';
+    $('weekly').innerHTML = '';
+  }
+}
+
+function renderWeather(data, city) {
+  const current = data.current;
+  const currentInfo = weatherInfo(current.weather_code, current.is_day);
+
+  $('temperature').textContent =
+    `${Math.round(current.temperature_2m)}°C`;
+  $('feelsLike').textContent =
+    `체감온도 ${Math.round(current.apparent_temperature)}°C`;
+  $('currentIcon').textContent = currentInfo.icon;
+  $('condition').textContent = currentInfo.name;
+
+  // 시간별 예보: 현재 시각부터 5개 표시
+  const now = new Date(current.time);
+  const times = data.hourly.time;
+  let startIndex = times.findIndex(t => new Date(t) >= now);
+  if (startIndex < 0) startIndex = 0;
+
+  const hourlyHTML = [];
+  for (let i = startIndex; i < Math.min(startIndex + 7, times.length); i++) {
+    const date = new Date(times[i]);
+    const hour = String(date.getHours()).padStart(2, '0') + ':00';
+    const info = weatherInfo(data.hourly.weather_code[i],
+      date.getHours() >= 6 && date.getHours() < 18 ? 1 : 0);
+
+    hourlyHTML.push(`
+      <div class="hour-item">
+        <div class="hour-time">${hour}</div>
+        <div class="hour-icon">${info.icon}</div>
+        <div class="hour-temp">${Math.round(data.hourly.temperature_2m[i])}°</div>
+      </div>
+    `);
+  }
+  $('hourly').innerHTML = hourlyHTML.join('');
+
+  // 7일 예보
+  $('weekly').innerHTML = data.daily.time.map((date, i) => {
+    const info = weatherInfo(data.daily.weather_code[i]);
+    return `
+      <div class="week-row">
+        <div class="week-day">${formatDay(date, i)}</div>
+        <div class="week-icon">${info.icon}</div>
+        <div class="week-high">${Math.round(data.daily.temperature_2m_max[i])}°</div>
+        <div class="week-low">${Math.round(data.daily.temperature_2m_min[i])}°</div>
+      </div>
+    `;
+  }).join('');
+
+  $('updated').textContent =
+    `${city} · ${new Date().toLocaleTimeString('ko-KR', {
+      hour: '2-digit', minute: '2-digit'
+    })} 기준`;
+}
+
+$('searchBtn').addEventListener('click', searchCity);
+$('citySearch').addEventListener('keydown', e => {
+  if (e.key === 'Enter') searchCity();
+});
+
+$('citySearch').addEventListener('focus', e => e.target.select());
+
+// 첫 화면: 도쿄
+loadWeather(35.6762, 139.6503, '도쿄');
+</script>
+html {
+  height: 100%;
+  background: 50% 50% no-repeat
+    url('data:image/svg+xml,<svg viewBox="-20 -5 60 40" width="140" xmlns="http://www.w3.org/2000/svg" opacity="0.2"><path d="M1 8l11-7 11 7v8l-11 7-11-7zm0 0l11 8 11-8m0 8L12 8 1 16M12 1v7m0 8v7" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"/><text x="-12" y="32" font-size="5" font-family="monospace" fill="currentColor">Built on CodePen</text></svg>');
+}
