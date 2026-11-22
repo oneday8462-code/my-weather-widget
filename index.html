@@ -459,7 +459,7 @@ body {
     <section class="weather-top">
       <div class="location-area">
         <div class="location-control">
-          <input id="citySearch" value="서울" placeholder="도시 검색">
+          <input id="citySearch" placeholder="도시 검색">
           <button id="searchBtn" aria-label="지역 검색">⌕</button>
         </div>
         <button id="favoriteBtn" class="favorite-btn" title="즐겨찾기 추가" aria-label="즐겨찾기 추가">☆</button>
@@ -517,11 +517,105 @@ const weatherAPI = 'https://api.open-meteo.com/v1/forecast';
 
 const $ = id => document.getElementById(id);
 
-let currentCity = {
-  name: '서울',
-  lat: 37.5665,
-  lon: 126.9780
+
+const citySettings = {
+  // 🇰🇷 한국
+  Seoul: {
+    name: '서울',
+    lat: 37.5665,
+    lon: 126.9780
+  },
+  Busan: {
+    name: '부산',
+    lat: 35.1796,
+    lon: 129.0756
+  },
+  Gangneung: {
+    name: '강릉',
+    lat: 37.7514,
+    lon: 128.8909
+  },
+  Jeju: {
+    name: '제주도',
+    lat: 33.4996,
+    lon: 126.5312
+  },
+  Ansan: {
+    name: '안산',
+    lat: 37.3219,
+    lon: 126.8309
+  },
+  Jeonju: {
+    name: '전주',
+    lat: 35.8242,
+    lon: 127.1480
+  },
+  Ganghwa: {
+    name: '강화도',
+    lat: 37.7073,
+    lon: 126.4463
+  },
+  Sancheong: {
+    name: '산청',
+    lat: 35.4129,
+    lon: 127.8791
+  },
+
+  // 🇯🇵 일본
+  Tokyo: {
+    name: '도쿄',
+    lat: 35.6895,
+    lon: 139.6917
+  },
+  Osaka: {
+    name: '오사카',
+    lat: 34.6938,
+    lon: 135.5011
+  },
+  Kyoto: {
+    name: '교토',
+    lat: 35.0211,
+    lon: 135.7539
+  },
+  Nagoya: {
+    name: '나고야',
+    lat: 35.1815,
+    lon: 136.9064
+  },
+  Fukuoka: {
+    name: '후쿠오카',
+    lat: 33.6000,
+    lon: 130.4167
+  },
+
+  // 🇹🇼 대만
+  Taipei: {
+    name: '타이베이',
+    lat: 25.0330,
+    lon: 121.5654
+  },
+  Taichung: {
+    name: '타이중',
+    lat: 24.1477,
+    lon: 120.6736
+  },
+  Tainan: {
+    name: '타이난',
+    lat: 22.9997,
+    lon: 120.2270
+  },
+  Kaohsiung: {
+    name: '가오슝',
+    lat: 22.6273,
+    lon: 120.3014
+  }
 };
+
+
+const params = new URLSearchParams(window.location.search);
+const cityKey = params.get('city') || 'Seoul';
+
+let currentCity = citySettings[cityKey] || citySettings.Seoul;
 
 let favorites = [];
 
@@ -995,7 +1089,14 @@ document.addEventListener('click', e => {
 
 // 초기 실행
 loadFavorites();
-loadWeather(37.5665, 126.9780, '서울');
+
+$('citySearch').value = currentCity.name;
+
+loadWeather(
+  currentCity.lat,
+  currentCity.lon,
+  currentCity.name
+);
 </script>
 </body>
 </html>
