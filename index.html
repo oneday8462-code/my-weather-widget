@@ -1,49 +1,10 @@
 
-<div class="weather-app">
-  <div class="weather-card">
-
-    <section class="weather-top">
-      <div class="location-area">
-        <div class="location-control">
-          <input id="citySearch" value="도쿄" placeholder="도시 검색">
-          <button id="searchBtn" aria-label="지역 검색">⌕</button>
-        </div>
-        <button id="favoriteBtn" class="favorite-btn" title="즐겨찾기 추가" aria-label="즐겨찾기 추가">☆</button>
-      </div>
-
-      <div id="searchResults" class="search-results"></div>
-
-      <div id="favoritesArea" class="favorites-area">
-        <div class="favorites-label">즐겨찾기</div>
-        <div id="favoritesList" class="favorites-list"></div>
-      </div>
-
-      <div class="current-weather">
-        <div>
-          <div id="temperature" class="temperature">--°C</div>
-          <div id="feelsLike" class="feels-like">체감온도 --°C</div>
-        </div>
-        <div class="current-icon-area">
-          <div id="currentIcon" class="current-icon"></div>
-          <div id="condition" class="condition">날씨 정보를 불러오는 중</div>
-        </div>
-      </div>
-
-      <div class="hourly-wrapper">
-        <button id="hourLeft" class="hour-arrow left" aria-label="이전 시간">‹</button>
-        <div id="hourly" class="hourly-list"></div>
-        <button id="hourRight" class="hour-arrow right" aria-label="다음 시간">›</button>
-      </div>
-    </section>
-
-    <section class="weekly-section">
-      <div id="weekly" class="weekly-list"></div>
-    </section>
-
-    <div id="updated" class="updated"></div>
-  </div>
-</div>
-
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>날씨 위젯</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&display=swap');
 
@@ -87,11 +48,6 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.pin-icon {
-  color: #778197;
-  font-size: 22px;
 }
 
 .location-control {
@@ -141,7 +97,7 @@ body {
   position: absolute;
   z-index: 10;
   top: 65px;
-  left: 45px;
+  left: 25px;
   right: 25px;
   max-height: 220px;
   overflow-y: auto;
@@ -168,46 +124,113 @@ body {
   background: #f1f2ff;
 }
 
+/* 즐겨찾기 드롭다운 */
 .favorites-area {
   display: none;
-  margin-top: 17px;
+  margin-top: 13px;
+  position: relative;
 }
 
-.favorites-label {
-  margin-bottom: 8px;
-  color: #929bb0;
-  font-size: 11px;
-}
-
-.favorites-list {
+.favorites-toggle {
   display: flex;
-  gap: 7px;
-  flex-wrap: wrap;
-}
-
-.favorite-chip {
-  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border: 1px solid #dfe2fa;
-  border-radius: 20px;
-  background: rgba(255,255,255,.7);
-  color: #64718d;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #e1e4f7;
+  border-radius: 11px;
+  background: rgba(255,255,255,.65);
+  color: #78839c;
   font-family: inherit;
   font-size: 12px;
   cursor: pointer;
 }
 
-.favorite-chip.selected {
-  border-color: #8190ff;
+.favorites-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.favorites-count {
+  color: #9ba4b6;
+  font-size: 11px;
+}
+
+.favorites-arrow {
+  color: #8791aa;
+  font-size: 14px;
+  transition: transform .2s ease;
+}
+
+.favorites-toggle[aria-expanded="true"] .favorites-arrow {
+  transform: rotate(180deg);
+}
+
+.favorites-list {
+  display: none;
+  margin-top: 6px;
+  padding: 5px;
+  border: 1px solid #e5e7f5;
+  border-radius: 12px;
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 5px 15px rgba(50,60,100,.07);
+}
+
+.favorites-list.open {
+  display: block;
+}
+
+.favorite-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px;
+}
+
+.favorite-item + .favorite-item {
+  border-top: 1px solid #f0f1f7;
+}
+
+.favorite-city {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #64718d;
+  text-align: left;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.favorite-city:hover {
+  background: #f3f4ff;
+}
+
+.favorite-city.selected {
   background: #e9ebff;
   color: #5365d9;
+  font-weight: 600;
 }
 
 .remove-favorite {
+  flex-shrink: 0;
+  width: 27px;
+  height: 27px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
   color: #a0a8ba;
-  font-size: 14px;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.remove-favorite:hover {
+  background: #f5f5f8;
+  color: #e17c7c;
 }
 
 .current-weather {
@@ -247,12 +270,6 @@ body {
   margin-top: 7px;
   color: #66738e;
   font-size: 14px;
-}
-
-.hourly-header {
-  margin: 10px 0 14px;
-  color: #78839c;
-  font-size: 13px;
 }
 
 .hourly-wrapper {
@@ -330,92 +347,78 @@ body {
   cursor: default;
 }
 
+/* 주간 예보: 7일 가로형 */
 .weekly-section {
   padding: 22px clamp(18px, 5vw, 27px) 14px;
 }
 
-.weekly-title {
-  margin-bottom: 17px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #27344b;
+.weekly-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #dfe2f1 transparent;
+  padding-bottom: 7px;
 }
 
-.weekly-title span {
-  margin-left: 5px;
-  color: #9aa3b6;
-  font-size: 11px;
-  font-weight: 400;
-}
-
-.weekly-heading,
-.week-row {
+.weekly-list {
   display: grid;
-  grid-template-columns: minmax(0,1fr) 45px 45px 45px;
-  align-items: center;
-  gap: 6px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  min-width: 448px;
+  gap: 5px;
 }
 
-.weekly-heading {
-  margin-bottom: 7px;
-  color: #a0a8b8;
-  font-size: 10px;
+.week-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 0;
+  gap: 10px;
+  padding: 10px 3px;
+  border-radius: 12px;
+  background: #f7f8fc;
   text-align: center;
 }
 
-.weekly-heading span:first-child {
-  text-align: left;
-}
-
-.week-row {
-  min-height: 42px;
-}
-
-.week-day {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-}
-
 .week-date {
-  font-size: 13px;
+  color: #536079;
+  font-size: 11px;
   font-weight: 500;
   white-space: nowrap;
-}
-
-.week-date {
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.week-weekday {
-  color: #9ba4b6;
-  font-size: 10px;
 }
 
 .week-icon {
   display: flex;
   justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 30px;
 }
 
 .week-icon svg {
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
 }
 
-.week-high,
-.week-low {
-  text-align: center;
-  font-size: 13px;
+.week-temperatures {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
 }
 
 .week-high {
-  font-weight: 500;
+  color: #27344b;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .week-low {
   color: #929caf;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 .updated {
@@ -442,13 +445,71 @@ body {
     flex-basis: 40px;
   }
 
-  .weekly-heading,
-  .week-row {
-    grid-template-columns: minmax(0,1fr) 38px 39px 39px;
-    gap: 4px;
+  .weekly-list {
+    min-width: 448px;
   }
 }
 </style>
+</head>
+
+<body>
+<div class="weather-app">
+  <div class="weather-card">
+
+    <section class="weather-top">
+      <div class="location-area">
+        <div class="location-control">
+          <input id="citySearch" value="도쿄" placeholder="도시 검색">
+          <button id="searchBtn" aria-label="지역 검색">⌕</button>
+        </div>
+        <button id="favoriteBtn" class="favorite-btn" title="즐겨찾기 추가" aria-label="즐겨찾기 추가">☆</button>
+      </div>
+
+      <div id="searchResults" class="search-results"></div>
+
+      <div id="favoritesArea" class="favorites-area">
+        <button
+          id="favoritesToggle"
+          class="favorites-toggle"
+          type="button"
+          aria-expanded="false"
+        >
+          <span class="favorites-toggle-left">
+            <span>즐겨찾기</span>
+            <span id="favoritesCount" class="favorites-count"></span>
+          </span>
+          <span class="favorites-arrow">⌄</span>
+        </button>
+        <div id="favoritesList" class="favorites-list"></div>
+      </div>
+
+      <div class="current-weather">
+        <div>
+          <div id="temperature" class="temperature">--°C</div>
+          <div id="feelsLike" class="feels-like">체감온도 --°C</div>
+        </div>
+        <div class="current-icon-area">
+          <div id="currentIcon" class="current-icon"></div>
+          <div id="condition" class="condition">날씨 정보를 불러오는 중</div>
+        </div>
+      </div>
+
+      <div class="hourly-wrapper">
+        <button id="hourLeft" class="hour-arrow left" aria-label="이전 시간">‹</button>
+        <div id="hourly" class="hourly-list"></div>
+        <button id="hourRight" class="hour-arrow right" aria-label="다음 시간">›</button>
+      </div>
+    </section>
+
+    <section class="weekly-section">
+      <div class="weekly-scroll">
+        <div id="weekly" class="weekly-list"></div>
+      </div>
+    </section>
+
+    <div id="updated" class="updated"></div>
+  </div>
+</div>
 
 <script>
 const geoAPI = 'https://geocoding-api.open-meteo.com/v1/search';
@@ -463,7 +524,6 @@ let currentCity = {
 };
 
 let favorites = [];
-let searchTimer = null;
 
 const weatherTypes = {
   0: ['맑음', 'sun'],
@@ -496,8 +556,7 @@ const weatherTypes = {
   99: ['강한 뇌우', 'storm']
 };
 
-// 선형 SVG 아이콘
-
+// 날씨 아이콘
 function iconSvg(type, size = 28) {
   const iconColors = {
     sun: '#F5A642',
@@ -576,7 +635,6 @@ function iconSvg(type, size = 28) {
   return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" ${common}>${shapes[type] || shapes.cloud}</svg>`;
 }
 
-
 function weatherInfo(code, isDay = 1) {
   const info = weatherTypes[code] || ['날씨 정보', 'cloud'];
   let type = info[1];
@@ -596,6 +654,7 @@ function saveFavorites() {
   }
 }
 
+// 즐겨찾기 불러오기
 function loadFavorites() {
   try {
     favorites = JSON.parse(
@@ -610,51 +669,73 @@ function loadFavorites() {
   renderFavorites();
 }
 
+// 즐겨찾기 드롭다운 표시
 function renderFavorites() {
   const area = $('favoritesArea');
   const list = $('favoritesList');
 
   area.style.display = favorites.length ? 'block' : 'none';
+  $('favoritesCount').textContent = favorites.length
+    ? `${favorites.length}`
+    : '';
 
   list.innerHTML = '';
 
   favorites.forEach((place, index) => {
-    const chip = document.createElement('button');
-    chip.className = 'favorite-chip';
+    const item = document.createElement('div');
+    item.className = 'favorite-item';
+
+    const cityButton = document.createElement('button');
+    cityButton.type = 'button';
+    cityButton.className = 'favorite-city';
 
     const isSelected =
       place.lat === currentCity.lat &&
       place.lon === currentCity.lon;
 
-    if (isSelected) chip.classList.add('selected');
+    if (isSelected) cityButton.classList.add('selected');
 
-    const name = document.createElement('span');
-    name.textContent = place.name;
+    cityButton.textContent = place.name;
 
-    const remove = document.createElement('span');
-    remove.className = 'remove-favorite';
-    remove.textContent = '×';
-    remove.title = '즐겨찾기 삭제';
-
-    chip.appendChild(name);
-    chip.appendChild(remove);
-
-    chip.addEventListener('click', () => {
+    cityButton.addEventListener('click', () => {
+      closeFavoritesDropdown();
       loadWeather(place.lat, place.lon, place.name);
     });
 
-    remove.addEventListener('click', e => {
-      e.stopPropagation();
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'remove-favorite';
+    removeButton.textContent = '×';
+    removeButton.title = '즐겨찾기 삭제';
+    removeButton.setAttribute('aria-label', `${place.name} 즐겨찾기 삭제`);
+
+    removeButton.addEventListener('click', () => {
       favorites.splice(index, 1);
       saveFavorites();
       renderFavorites();
       updateFavoriteButton();
     });
 
-    list.appendChild(chip);
+    item.appendChild(cityButton);
+    item.appendChild(removeButton);
+    list.appendChild(item);
   });
 }
 
+function toggleFavoritesDropdown() {
+  const list = $('favoritesList');
+  const button = $('favoritesToggle');
+  const isOpen = list.classList.toggle('open');
+
+  button.setAttribute('aria-expanded', String(isOpen));
+}
+
+function closeFavoritesDropdown() {
+  $('favoritesList').classList.remove('open');
+  $('favoritesToggle').setAttribute('aria-expanded', 'false');
+}
+
+// 현재 도시 즐겨찾기 여부 표시
 function updateFavoriteButton() {
   const exists = favorites.some(place =>
     place.lat === currentCity.lat &&
@@ -664,8 +745,13 @@ function updateFavoriteButton() {
   $('favoriteBtn').classList.toggle('active', exists);
   $('favoriteBtn').textContent = exists ? '★' : '☆';
   $('favoriteBtn').title = exists ? '즐겨찾기 삭제' : '즐겨찾기 추가';
+  $('favoriteBtn').setAttribute(
+    'aria-label',
+    exists ? '즐겨찾기 삭제' : '즐겨찾기 추가'
+  );
 }
 
+// 즐겨찾기 추가 및 삭제
 function toggleFavorite() {
   const index = favorites.findIndex(place =>
     place.lat === currentCity.lat &&
@@ -837,21 +923,19 @@ function renderWeather(data, city) {
     const info = weatherInfo(data.daily.weather_code[i]);
 
     const dateObj = new Date(date + 'T12:00:00');
-
     const dateText = `${dateObj.getMonth() + 1}/${dateObj.getDate()}`;
-
     const weekday = dateObj.toLocaleDateString('ko-KR', {
       weekday: 'short'
     });
 
     return `
       <div class="week-row">
-        <div class="week-day">
-          <span class="week-date">${dateText} ${weekday}</span>
+        <div class="week-date">${dateText} ${weekday}</div>
+        <div class="week-icon">${iconSvg(info.type, 25)}</div>
+        <div class="week-temperatures">
+          <span class="week-high">${Math.round(data.daily.temperature_2m_max[i])}°</span>
+          <span class="week-low">${Math.round(data.daily.temperature_2m_min[i])}°</span>
         </div>
-        <div class="week-icon">${iconSvg(info.type, 24)}</div>
-        <div class="week-high">${Math.round(data.daily.temperature_2m_max[i])}°</div>
-        <div class="week-low">${Math.round(data.daily.temperature_2m_min[i])}°</div>
       </div>
     `;
   }).join('');
@@ -895,11 +979,17 @@ $('citySearch').addEventListener('keydown', e => {
 });
 
 $('favoriteBtn').addEventListener('click', toggleFavorite);
+$('favoritesToggle').addEventListener('click', toggleFavoritesDropdown);
 
+// 바깥 영역을 누르면 검색 결과와 즐겨찾기 닫기
 document.addEventListener('click', e => {
   if (!e.target.closest('.location-area') &&
       !e.target.closest('.search-results')) {
     $('searchResults').style.display = 'none';
+  }
+
+  if (!e.target.closest('.favorites-area')) {
+    closeFavoritesDropdown();
   }
 });
 
@@ -907,3 +997,5 @@ document.addEventListener('click', e => {
 loadFavorites();
 loadWeather(35.6762, 139.6503, '도쿄');
 </script>
+</body>
+</html>
