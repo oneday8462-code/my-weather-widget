@@ -4,7 +4,6 @@
 
     <section class="weather-top">
       <div class="location-area">
-        <span class="pin-icon">⌖</span>
         <div class="location-control">
           <input id="citySearch" value="도쿄" placeholder="도시 검색">
           <button id="searchBtn" aria-label="지역 검색">⌕</button>
@@ -30,8 +29,6 @@
         </div>
       </div>
 
-      <div class="hourly-header">시간별 날씨</div>
-
       <div class="hourly-wrapper">
         <button id="hourLeft" class="hour-arrow left" aria-label="이전 시간">‹</button>
         <div id="hourly" class="hourly-list"></div>
@@ -40,13 +37,6 @@
     </section>
 
     <section class="weekly-section">
-      <div class="weekly-title">주간 날씨 <span>7일 예보</span></div>
-      <div class="weekly-heading">
-        <span>날짜</span>
-        <span>날씨</span>
-        <span>최고</span>
-        <span>최저</span>
-      </div>
       <div id="weekly" class="weekly-list"></div>
     </section>
 
@@ -383,8 +373,15 @@ body {
 
 .week-day {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.week-date {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .week-date {
@@ -501,7 +498,21 @@ const weatherTypes = {
 
 // 선형 SVG 아이콘
 function iconSvg(type, size = 28) {
-  const common = `fill="none" stroke="#7180ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"`;
+  const iconColors = {
+  sun: '#F5A642',       // 해: 주황색
+  partly: '#EBA94B',    // 구름 조금: 따뜻한 노랑
+  cloud: '#A5AAB3',     // 구름: 회색
+  rain: '#579BEF',      // 비: 파란색
+  snow: '#79B9E9',      // 눈: 하늘색
+  fog: '#A5AAB3',       // 안개: 회색
+  storm: '#7B83C9',     // 뇌우: 보라색
+  moon: '#EFCB58',      // 달: 노란색
+  nightCloud: '#C3AD69' // 야간 구름: 차분한 노랑
+};
+
+const color = iconColors[type] || '#A5AAB3';
+
+const common = `fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"`;
 
   const shapes = {
     sun: `
@@ -814,8 +825,7 @@ function renderWeather(data, city) {
     return `
       <div class="week-row">
         <div class="week-day">
-          <span class="week-date">${dateText}</span>
-          <span class="week-weekday">${weekday}</span>
+          <span class="week-date">${dateText} ${weekday}</span>
         </div>
         <div class="week-icon">${iconSvg(info.type, 24)}</div>
         <div class="week-high">${Math.round(data.daily.temperature_2m_max[i])}°</div>
