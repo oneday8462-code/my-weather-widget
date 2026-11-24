@@ -77,21 +77,6 @@ body {
   cursor: pointer;
 }
 
-.favorite-btn {
-  width: 35px;
-  height: 35px;
-  border: 0;
-  background: transparent;
-  color: #7180ff;
-  font-size: 25px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.favorite-btn.active {
-  color: #f2b84b;
-}
-
 .search-results {
   display: none;
   position: absolute;
@@ -122,115 +107,6 @@ body {
 
 .search-results button:hover {
   background: #f1f2ff;
-}
-
-/* 즐겨찾기 드롭다운 */
-.favorites-area {
-  display: none;
-  margin-top: 13px;
-  position: relative;
-}
-
-.favorites-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 9px 12px;
-  border: 1px solid #e1e4f7;
-  border-radius: 11px;
-  background: rgba(255,255,255,.65);
-  color: #78839c;
-  font-family: inherit;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.favorites-toggle-left {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.favorites-count {
-  color: #9ba4b6;
-  font-size: 11px;
-}
-
-.favorites-arrow {
-  color: #8791aa;
-  font-size: 14px;
-  transition: transform .2s ease;
-}
-
-.favorites-toggle[aria-expanded="true"] .favorites-arrow {
-  transform: rotate(180deg);
-}
-
-.favorites-list {
-  display: none;
-  margin-top: 6px;
-  padding: 5px;
-  border: 1px solid #e5e7f5;
-  border-radius: 12px;
-  background: rgba(255,255,255,.92);
-  box-shadow: 0 5px 15px rgba(50,60,100,.07);
-}
-
-.favorites-list.open {
-  display: block;
-}
-
-.favorite-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px;
-}
-
-.favorite-item + .favorite-item {
-  border-top: 1px solid #f0f1f7;
-}
-
-.favorite-city {
-  flex: 1;
-  min-width: 0;
-  padding: 8px 9px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: #64718d;
-  text-align: left;
-  font-family: inherit;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.favorite-city:hover {
-  background: #f3f4ff;
-}
-
-.favorite-city.selected {
-  background: #e9ebff;
-  color: #5365d9;
-  font-weight: 600;
-}
-
-.remove-favorite {
-  flex-shrink: 0;
-  width: 27px;
-  height: 27px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: #a0a8ba;
-  font-size: 17px;
-  cursor: pointer;
-}
-
-.remove-favorite:hover {
-  background: #f5f5f8;
-  color: #e17c7c;
 }
 
 .current-weather {
@@ -457,31 +333,14 @@ body {
   <div class="weather-card">
 
     <section class="weather-top">
-      <div class="location-area">
-        <div class="location-control">
-          <input id="citySearch" placeholder="도시 검색">
-          <button id="searchBtn" aria-label="지역 검색">⌕</button>
-        </div>
-        <button id="favoriteBtn" class="favorite-btn" title="즐겨찾기 추가" aria-label="즐겨찾기 추가">☆</button>
-      </div>
+<div class="location-area">
+  <div class="location-control">
+    <input id="citySearch" placeholder="도시 검색">
+    <button id="searchBtn" aria-label="지역 검색">⌕</button>
+  </div>
+</div>
 
-      <div id="searchResults" class="search-results"></div>
-
-      <div id="favoritesArea" class="favorites-area">
-        <button
-          id="favoritesToggle"
-          class="favorites-toggle"
-          type="button"
-          aria-expanded="false"
-        >
-          <span class="favorites-toggle-left">
-            <span>즐겨찾기</span>
-            <span id="favoritesCount" class="favorites-count"></span>
-          </span>
-          <span class="favorites-arrow">⌄</span>
-        </button>
-        <div id="favoritesList" class="favorites-list"></div>
-      </div>
+<div id="searchResults" class="search-results"></div>
 
       <div class="current-weather">
         <div>
@@ -611,13 +470,11 @@ const citySettings = {
   }
 };
 
-
-const params = new URLSearchParams(window.location.search);
-const cityKey = params.get('city') || 'Seoul';
+const cityKey = decodeURIComponent(
+  window.location.hash.slice(1)
+).trim() || 'Seoul';
 
 let currentCity = citySettings[cityKey] || citySettings.Seoul;
-
-let favorites = [];
 
 const weatherTypes = {
   0: ['맑음', 'sun'],
@@ -739,134 +596,6 @@ function weatherInfo(code, isDay = 1) {
   return { name: info[0], type };
 }
 
-// 즐겨찾기 저장
-function saveFavorites() {
-  try {
-    localStorage.setItem('myWeatherFavorites', JSON.stringify(favorites));
-  } catch (e) {
-    console.warn('즐겨찾기를 저장할 수 없습니다.', e);
-  }
-}
-
-// 즐겨찾기 불러오기
-function loadFavorites() {
-  try {
-    favorites = JSON.parse(
-      localStorage.getItem('myWeatherFavorites') || '[]'
-    );
-
-    if (!Array.isArray(favorites)) favorites = [];
-  } catch (e) {
-    favorites = [];
-  }
-
-  renderFavorites();
-}
-
-// 즐겨찾기 드롭다운 표시
-function renderFavorites() {
-  const area = $('favoritesArea');
-  const list = $('favoritesList');
-
-  area.style.display = favorites.length ? 'block' : 'none';
-  $('favoritesCount').textContent = favorites.length
-    ? `${favorites.length}`
-    : '';
-
-  list.innerHTML = '';
-
-  favorites.forEach((place, index) => {
-    const item = document.createElement('div');
-    item.className = 'favorite-item';
-
-    const cityButton = document.createElement('button');
-    cityButton.type = 'button';
-    cityButton.className = 'favorite-city';
-
-    const isSelected =
-      place.lat === currentCity.lat &&
-      place.lon === currentCity.lon;
-
-    if (isSelected) cityButton.classList.add('selected');
-
-    cityButton.textContent = place.name;
-
-    cityButton.addEventListener('click', () => {
-      closeFavoritesDropdown();
-      loadWeather(place.lat, place.lon, place.name);
-    });
-
-    const removeButton = document.createElement('button');
-    removeButton.type = 'button';
-    removeButton.className = 'remove-favorite';
-    removeButton.textContent = '×';
-    removeButton.title = '즐겨찾기 삭제';
-    removeButton.setAttribute('aria-label', `${place.name} 즐겨찾기 삭제`);
-
-    removeButton.addEventListener('click', () => {
-      favorites.splice(index, 1);
-      saveFavorites();
-      renderFavorites();
-      updateFavoriteButton();
-    });
-
-    item.appendChild(cityButton);
-    item.appendChild(removeButton);
-    list.appendChild(item);
-  });
-}
-
-function toggleFavoritesDropdown() {
-  const list = $('favoritesList');
-  const button = $('favoritesToggle');
-  const isOpen = list.classList.toggle('open');
-
-  button.setAttribute('aria-expanded', String(isOpen));
-}
-
-function closeFavoritesDropdown() {
-  $('favoritesList').classList.remove('open');
-  $('favoritesToggle').setAttribute('aria-expanded', 'false');
-}
-
-// 현재 도시 즐겨찾기 여부 표시
-function updateFavoriteButton() {
-  const exists = favorites.some(place =>
-    place.lat === currentCity.lat &&
-    place.lon === currentCity.lon
-  );
-
-  $('favoriteBtn').classList.toggle('active', exists);
-  $('favoriteBtn').textContent = exists ? '★' : '☆';
-  $('favoriteBtn').title = exists ? '즐겨찾기 삭제' : '즐겨찾기 추가';
-  $('favoriteBtn').setAttribute(
-    'aria-label',
-    exists ? '즐겨찾기 삭제' : '즐겨찾기 추가'
-  );
-}
-
-// 즐겨찾기 추가 및 삭제
-function toggleFavorite() {
-  const index = favorites.findIndex(place =>
-    place.lat === currentCity.lat &&
-    place.lon === currentCity.lon
-  );
-
-  if (index >= 0) {
-    favorites.splice(index, 1);
-  } else {
-    favorites.push({
-      name: currentCity.name,
-      lat: currentCity.lat,
-      lon: currentCity.lon
-    });
-  }
-
-  saveFavorites();
-  renderFavorites();
-  updateFavoriteButton();
-}
-
 // 지역 검색
 async function searchCity() {
   const query = $('citySearch').value.trim();
@@ -930,9 +659,6 @@ async function loadWeather(lat, lon, city) {
   $('temperature').textContent = '--°C';
   $('condition').textContent = '날씨 정보를 불러오는 중';
   $('currentIcon').innerHTML = iconSvg('cloud', 65);
-
-  renderFavorites();
-  updateFavoriteButton();
 
   const params = new URLSearchParams({
     latitude: lat,
@@ -1072,24 +798,39 @@ $('citySearch').addEventListener('keydown', e => {
   if (e.key === 'Enter') searchCity();
 });
 
-$('favoriteBtn').addEventListener('click', toggleFavorite);
-$('favoritesToggle').addEventListener('click', toggleFavoritesDropdown);
-
-// 바깥 영역을 누르면 검색 결과와 즐겨찾기 닫기
+// 바깥 영역을 누르면 검색 결과 닫기
 document.addEventListener('click', e => {
-  if (!e.target.closest('.location-area') &&
-      !e.target.closest('.search-results')) {
+  if (
+    !e.target.closest('.location-area') &&
+    !e.target.closest('.search-results')
+  ) {
     $('searchResults').style.display = 'none';
-  }
-
-  if (!e.target.closest('.favorites-area')) {
-    closeFavoritesDropdown();
   }
 });
 
-// 초기 실행
-loadFavorites();
+  // URL의 도시 코드가 변경되면 날씨 갱신
+window.addEventListener('hashchange', () => {
+  const cityKey = decodeURIComponent(
+    window.location.hash.slice(1)
+  ).trim();
 
+  const city = citySettings[cityKey];
+
+  if (!city) {
+    $('condition').textContent = '등록되지 않은 도시입니다.';
+    return;
+  }
+
+  $('citySearch').value = city.name;
+
+  loadWeather(
+    city.lat,
+    city.lon,
+    city.name
+  );
+});
+
+// 초기 실행
 $('citySearch').value = currentCity.name;
 
 loadWeather(
@@ -1097,6 +838,7 @@ loadWeather(
   currentCity.lon,
   currentCity.name
 );
+
 </script>
 </body>
 </html>
